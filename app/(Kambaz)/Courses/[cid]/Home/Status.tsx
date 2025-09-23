@@ -4,17 +4,17 @@ const courseInfo = {
     "5610": {
         title: "CS5610 Web Development",
         status: "Published",
-        enrollment: "45 students"
+        enrollment: "xx students"
     },
     "5700": {
         title: "CS5700 Computer Networks", 
         status: "Published",
-        enrollment: "38 students"
+        enrollment: "xx students"
     },
     "5800": {
         title: "CS5800 Algorithms",
         status: "Published", 
-        enrollment: "52 students"
+        enrollment: "xx students"
     }
 };
 
