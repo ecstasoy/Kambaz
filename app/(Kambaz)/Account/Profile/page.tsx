@@ -3,17 +3,17 @@ export default function Profile() {
   return (
     <div id="wd-profile-screen">
       <h3>Profile</h3>
-      <input defaultValue="alice" placeholder="username" />
+      <input defaultValue="kunhuahuang" placeholder="username" />
       <br />
-      <input defaultValue="123" placeholder="password" type="password" />
+      <input defaultValue="default" placeholder="password" type="password" />
       <br />
-      <input defaultValue="Alice" placeholder="First Name" />
+      <input defaultValue="Kunhua" placeholder="First Name" />
       <br />
-      <input defaultValue="Wonderland" placeholder="Last Name" />
+      <input defaultValue="Huang" placeholder="Last Name" />
       <br />
-      <input defaultValue="2000-01-01" type="date" id="wd-dob" />
+      <input defaultValue="2000-11-29" type="date" id="wd-dob" />
       <br />
-      <input defaultValue="alice@wonderland" type="email" id="wd-email" />
+      <input defaultValue="example@email.com" type="email" id="wd-email" />
       <br />
       <select defaultValue="FACULTY" id="wd-role">
         <option value="USER">User</option>
