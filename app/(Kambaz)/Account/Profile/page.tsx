@@ -15,7 +15,7 @@ export default function Profile() {
       <br />
       <input defaultValue="example@email.com" type="email" id="wd-email" />
       <br />
-      <select defaultValue="FACULTY" id="wd-role">
+      <select defaultValue="STUDENT" id="wd-role">
         <option value="USER">User</option>
         <option value="ADMIN">Admin</option>
         <option value="FACULTY">Faculty</option>
