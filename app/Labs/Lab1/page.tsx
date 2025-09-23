@@ -132,5 +132,5 @@ export default function Lab1() {
                 <option value="FANTASY">         Fantasy         </option>
             </select>
         </div>
-);
+    );
 }
