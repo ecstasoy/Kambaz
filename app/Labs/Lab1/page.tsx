@@ -124,13 +124,43 @@ export default function Lab1() {
             </select>
 
             <h5>Select many</h5>
-            <label  htmlFor="wd-select-many-genre"> Favorite movie genres: </label><br/>
+            <label htmlFor="wd-select-many-genre"> Favorite movie genres: </label><br/>
             <select multiple id="wd-select-many-genre">
-                <option value="COMEDY" selected> Comedy          </option>
-                <option value="DRAMA">           Drama           </option>
-                <option value="SCIFI"  selected> Science Fiction </option>
-                <option value="FANTASY">         Fantasy         </option>
+                <option value="COMEDY" selected> Comedy</option>
+                <option value="DRAMA"> Drama</option>
+                <option value="SCIFI" selected> Science Fiction</option>
+                <option value="FANTASY"> Fantasy</option>
             </select>
+
+            <h4>Other HTML field types</h4>
+
+            <label htmlFor="wd-text-fields-email"> Email: </label>
+            <input type="email"
+                   placeholder="jdoe@somewhere.com"
+                   id="wd-text-fields-email"/><br/>
+
+            <label htmlFor="wd-text-fields-salary-start"> Starting salary:</label>
+            <input type="number"
+                   defaultValue="100000"
+                   placeholder="1000"
+                   id="wd-text-fields-salary-start"/><br/>
+
+            <label htmlFor="wd-text-fields-rating"> Rating: </label>
+            <input type="range"
+                   defaultValue="4"
+                   max="5"
+                   placeholder="Doe"
+                   id="wd-text-fields-rating"/><br/>
+
+            <label htmlFor="wd-text-fields-dob"> Date of birth: </label>
+            <input type="date"
+                   defaultValue="2000-01-21"
+                   id="wd-text-fields-dob"/><br/>
+
+            <h4>Anchor tag</h4>
+            Please
+            <a href="https://www.lipsum.com" id="wd-lipsum">click here</a>
+            to get dummy text<br/>
         </div>
     );
 }
