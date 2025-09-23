@@ -43,7 +43,7 @@ export default function Labs() {
         <ul>
           <li>
             <a 
-              href="https://github.com/ecstasoy/kambaz-next-js"
+              href="https://github.com/ecstasoy/kambaz"
               target="_blank" 
               rel="noopener noreferrer"
               id="wd-github-repo"
