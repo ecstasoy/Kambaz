@@ -1,5 +1,9 @@
 import { use } from 'react';
 import Link from 'next/link';
+import { Button, Form, InputGroup } from 'react-bootstrap';
+import { FaPlus, FaSearch } from 'react-icons/fa';
+import { BsGripVertical } from 'react-icons/bs';
+import { IoEllipsisVertical } from 'react-icons/io5';
 
 const courseAssignments = {
     "5610": {
@@ -134,37 +138,65 @@ export default function Assignments({
     }
 
     const renderSection = (sectionTitle: string, items: any[], percentage: string) => (
-        <div key={sectionTitle} className="wd-assignment-section">
-            <h3 id={`wd-${sectionTitle.toLowerCase()}-title`}>
-                {sectionTitle.toUpperCase()} {percentage} of Total <button>+</button>
-            </h3>
-            <ul className="wd-assignment-list">
+        <div key={sectionTitle} className="wd-assignment-section mb-4">
+            <div className="d-flex justify-content-between align-items-center p-3 bg-secondary">
+                <h5 className="mb-0" id={`wd-${sectionTitle.toLowerCase()}-title`}>
+                    <BsGripVertical className="me-2" />
+                    {sectionTitle.toUpperCase()} {percentage} of Total
+                </h5>
+                <div>
+                    <Button variant="outline-dark" size="sm" className="me-2">
+                        <FaPlus />
+                    </Button>
+                    <IoEllipsisVertical className="fs-5" />
+                </div>
+            </div>
+            <div className="border border-gray">
                 {items.map((item, index) => (
-                    <li key={index} className="wd-assignment-list-item">
-                        <Link
-                            href={`/Courses/${cid}/Assignments/${item.id}`}
-                            className="wd-assignment-link"
-                        >
+                    <div key={index} className="wd-assignment-list-item border-start border-success border-3 p-3 border-bottom">
+                        <div className="d-flex justify-content-between align-items-center">
                             <div>
-                                <strong>{item.title}</strong>
+                                <BsGripVertical className="me-2 text-muted" />
+                                <Link
+                                    href={`/Courses/${cid}/Assignments/${item.id}`}
+                                    className="wd-assignment-link text-decoration-none text-dark fw-bold"
+                                >
+                                    {item.title}
+                                </Link>
                                 <br />
-                                <small>Due: {item.dueDate} | Points: {item.points}</small>
+                                <small className="text-muted ms-4">
+                                    Due: {item.dueDate} | {item.points} pts
+                                </small>
                             </div>
-                        </Link>
-                    </li>
+                            <IoEllipsisVertical className="fs-5 text-muted" />
+                        </div>
+                    </div>
                 ))}
-            </ul>
-            <hr />
+            </div>
         </div>
     );
 
     return (
         <div id="wd-assignments">
-            <input placeholder="Search for Assignments" id="wd-search-assignment"/>
-            <button id="wd-add-assignment-group">+ Group</button>
-            <button id="wd-add-assignment">+ Assignment</button>
-            
-            <h2>{course.title}</h2>
+            <div className="d-flex justify-content-between align-items-center mb-4">
+                <div className="position-relative" style={{ width: "300px" }}>
+                    <Form.Control 
+                        placeholder="Search for Assignments" 
+                        id="wd-search-assignment"
+                        className="ps-5"
+                    />
+                    <FaSearch className="position-absolute top-50 start-0 translate-middle-y ms-3 text-muted" />
+                </div>
+                
+                <div>
+                    <Button variant="secondary" className="me-2" id="wd-add-assignment-group">
+                        <FaPlus className="me-1" /> Group
+                    </Button>
+                    <Button variant="danger" id="wd-add-assignment">
+                        <FaPlus className="me-1" /> Assignment
+                    </Button>
+                </div>
+            </div>
             
             {renderSection("Assignments", course.sections.assignments, "40%")}
             {renderSection("Quizzes", course.sections.quizzes, "10%")}

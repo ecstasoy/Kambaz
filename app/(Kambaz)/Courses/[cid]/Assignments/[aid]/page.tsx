@@ -1,4 +1,5 @@
 import { use } from 'react';
+import { Form, Button, Row, Col } from 'react-bootstrap';
 
 const assignmentDetails = {
   "5610": {
@@ -103,59 +104,114 @@ export default function AssignmentEditor({
 
   return (
     <div id="wd-assignments-editor">
-      <label htmlFor="wd-name">Assignment Name</label>
-      <input id="wd-name" defaultValue={assignment.title} />
-      <br />
-      <br />
-      <label htmlFor="wd-description">Description</label>
-      <br />
-      <textarea 
-        id="wd-description" 
-        rows={6} 
-        cols={50}
-        defaultValue={assignment.description}
-      />
-      <br />
-      <br />
-      <table>
-        <tbody>
-          <tr>
-            <td align="right" valign="top">
-              <label htmlFor="wd-points">Points</label>
-            </td>
-            <td>
-              <input id="wd-points" type="number" defaultValue={assignment.points} />
-            </td>
-          </tr>
-          <tr>
-            <td align="right" valign="top">
-              <label htmlFor="wd-due-date">Due Date</label>
-            </td>
-            <td>
-              <input 
-                id="wd-due-date" 
-                type="datetime-local" 
-                defaultValue={assignment.dueDate}
+      <div className="mb-4">
+        <h5 className="text-muted">{courseAssignments.title} &gt; Assignments &gt; {aid}</h5>
+      </div>
+      <Form>
+        <div className="mb-3">
+          <Form.Label htmlFor="wd-name">Assignment Name</Form.Label>
+          <Form.Control id="wd-name" defaultValue={assignment.title} />
+        </div>
+
+        <div className="mb-3">
+          <Form.Label htmlFor="wd-description">Description</Form.Label>
+          <Form.Control 
+            as="textarea"
+            id="wd-description" 
+            rows={6}
+            defaultValue={assignment.description}
+          />
+        </div>
+
+        <Row>
+          <Col md={6}>
+            <div className="mb-3">
+              <Form.Label htmlFor="wd-points">Points</Form.Label>
+              <Form.Control 
+                id="wd-points" 
+                type="number" 
+                defaultValue={assignment.points} 
               />
-            </td>
-          </tr>
-          <tr>
-            <td align="right" valign="top">
-              <label htmlFor="wd-available-from">Available From</label>
-            </td>
-            <td>
-              <input 
-                id="wd-available-from" 
-                type="datetime-local" 
-                defaultValue="2024-09-01T00:00:00"
-              />
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <br />
-      <button>Save</button>
-      <button>Cancel</button>
+            </div>
+          </Col>
+          <Col md={6}>
+            <div className="mb-3">
+              <Form.Label htmlFor="wd-assignment-group">Assignment Group</Form.Label>
+              <Form.Select id="wd-assignment-group" defaultValue="ASSIGNMENTS">
+                <option value="ASSIGNMENTS">ASSIGNMENTS</option>
+                <option value="QUIZZES">QUIZZES</option>
+                <option value="EXAMS">EXAMS</option>
+                <option value="PROJECT">PROJECT</option>
+              </Form.Select>
+            </div>
+          </Col>
+        </Row>
+
+        <Row>
+          <Col md={6}>
+            <div className="mb-3">
+              <Form.Label htmlFor="wd-display-grade-as">Display Grade as</Form.Label>
+              <Form.Select id="wd-display-grade-as" defaultValue="Percentage">
+                <option value="Percentage">Percentage</option>
+                <option value="Points">Points</option>
+                <option value="Letter Grade">Letter Grade</option>
+              </Form.Select>
+            </div>
+          </Col>
+          <Col md={6}>
+            <div className="mb-3">
+              <Form.Label htmlFor="wd-submission-type">Submission Type</Form.Label>
+              <Form.Select id="wd-submission-type" defaultValue="Online">
+                <option value="Online">Online</option>
+                <option value="Paper">Paper</option>
+                <option value="External Tool">External Tool</option>
+              </Form.Select>
+            </div>
+          </Col>
+        </Row>
+
+        <div className="mb-3">
+          <Form.Label htmlFor="wd-assign">Assign</Form.Label>
+          <div className="border p-3">
+            <Form.Control 
+              id="wd-assign" 
+              defaultValue="Everyone" 
+              className="mb-2"
+            />
+            <Row>
+              <Col md={4}>
+                <Form.Label htmlFor="wd-due-date">Due</Form.Label>
+                <Form.Control 
+                  id="wd-due-date" 
+                  type="date" 
+                  defaultValue="2024-05-13"
+                />
+              </Col>
+              <Col md={4}>
+                <Form.Label htmlFor="wd-available-from">Available from</Form.Label>
+                <Form.Control 
+                  id="wd-available-from" 
+                  type="date" 
+                  defaultValue="2024-05-06"
+                />
+              </Col>
+              <Col md={4}>
+                <Form.Label htmlFor="wd-available-until">Until</Form.Label>
+                <Form.Control 
+                  id="wd-available-until" 
+                  type="date" 
+                  defaultValue="2024-05-20"
+                />
+              </Col>
+            </Row>
+          </div>
+        </div>
+
+        <div className="d-flex gap-2">
+          <Button variant="success">Save</Button>
+          <Button variant="secondary">Cancel</Button>
+        </div>
+      </Form>
     </div>
   );
 }

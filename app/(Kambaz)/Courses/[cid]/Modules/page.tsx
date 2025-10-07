@@ -1,4 +1,9 @@
-import {use} from 'react';
+
+import { ListGroup, ListGroupItem } from "react-bootstrap";
+import { BsGripVertical } from "react-icons/bs";
+import ModulesControls from "./ModulesControls";
+import LessonControlButtons from "./LessonControlButtons";
+import ModuleControlButtons from "./ModuleControlButtons";
 
 const courseContent = {
     "5610": {
@@ -90,12 +95,12 @@ const courseContent = {
     }
 };
 
-export default function Modules({
+export default async function Modules({
                                     params,
                                 }: {
     params: Promise<{ cid: string }>;
 }) {
-    const {cid} = use(params);
+    const {cid} = await params;
     const course = courseContent[cid as keyof typeof courseContent];
 
     if (!course) {
@@ -104,26 +109,37 @@ export default function Modules({
 
     return (
         <div>
-            <h2>{course.title} - Modules</h2>
-            <ul id="wd-modules">
+            <ModulesControls />
+            <br /><br /><br /><br />
+            <ListGroup className="rounded-0" id="wd-modules">
                 {course.modules.map((module, moduleIndex) => (
-                    <li key={moduleIndex} className="wd-module">
-                        <div className="wd-title">{module.title}</div>
-                        <ul className="wd-lessons">
+                    <ListGroupItem key={moduleIndex} className="wd-module p-0 mb-5 fs-5 border-gray">
+                        <div className="wd-title p-3 ps-2 bg-secondary">
+                            <BsGripVertical className="me-2 fs-3" />
+                            {module.title}
+                            <ModuleControlButtons />
+                        </div>
+                        <ListGroup className="wd-lessons rounded-0">
                             {module.lessons.map((lesson, lessonIndex) => (
-                                <li key={lessonIndex} className="wd-lesson">
-                                    <span className="wd-title">{lesson.title}</span>
-                                    <ul className="wd-content">
-                                        {lesson.content.map((item, itemIndex) => (
-                                            <li key={itemIndex} className="wd-content-item">{item}</li>
-                                        ))}
-                                    </ul>
-                                </li>
+                                <ListGroupItem key={lessonIndex} className="wd-lesson p-3 ps-1">
+                                    <BsGripVertical className="me-2 fs-3" />
+                                    {lesson.title}
+                                    <LessonControlButtons />
+                                </ListGroupItem>
                             ))}
-                        </ul>
-                    </li>
+                            {module.lessons.map((lesson, lessonIndex) => 
+                                lesson.content.map((item, itemIndex) => (
+                                    <ListGroupItem key={`${lessonIndex}-${itemIndex}`} className="wd-lesson p-3 ps-1">
+                                        <BsGripVertical className="me-2 fs-3" />
+                                        {item}
+                                        <LessonControlButtons />
+                                    </ListGroupItem>
+                                ))
+                            )}
+                        </ListGroup>
+                    </ListGroupItem>
                 ))}
-            </ul>
+            </ListGroup>
         </div>
     );
 }
