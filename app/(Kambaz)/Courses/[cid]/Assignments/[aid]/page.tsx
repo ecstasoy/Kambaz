@@ -105,7 +105,7 @@ export default function AssignmentEditor({
   return (
     <div id="wd-assignments-editor">
       <div className="mb-4">
-        <h5 className="text-muted">{courseAssignments.title} &gt; Assignments &gt; {aid}</h5>
+        <h5 className="text-muted">CS{cid} &gt; Assignments &gt; {aid}</h5>
       </div>
       <Form>
         <div className="mb-3">
