@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Form, Button } from "react-bootstrap";
+import { Form } from "react-bootstrap";
 
 export default function Profile() {
     return (
@@ -52,14 +52,13 @@ export default function Profile() {
                 <option value="FACULTY">Faculty</option>
                 <option value="STUDENT">Student</option>
             </Form.Select>
-            <Button 
-                variant="danger" 
-                className="w-100"
-                as={Link}
+            <Link 
                 href="/Account/Signin"
+                className="btn btn-danger w-100"
+                id="wd-signout-btn"
             >
                 Signout
-            </Button>
+            </Link>
         </div>
     );
 }
