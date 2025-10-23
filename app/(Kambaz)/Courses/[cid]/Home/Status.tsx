@@ -7,24 +7,7 @@ import { LiaFileImportSolid } from "react-icons/lia";
 import { AiOutlineHome } from "react-icons/ai";
 import { MdOutlineAnalytics } from "react-icons/md";
 import { IoMdNotifications } from "react-icons/io";
-
-const courseInfo = {
-    "5610": {
-        title: "CS5610 Web Development",
-        status: "Published",
-        enrollment: "xx students"
-    },
-    "5700": {
-        title: "CS5700 Computer Networks", 
-        status: "Published",
-        enrollment: "xx students"
-    },
-    "5800": {
-        title: "CS5800 Algorithms",
-        status: "Published", 
-        enrollment: "xx students"
-    }
-};
+import * as db from "../../../Database";
 
 export default async function CourseStatus({
     params,
@@ -32,7 +15,7 @@ export default async function CourseStatus({
     params: Promise<{ cid: string }>;
 }) {
     const { cid } = await params;
-    const course = courseInfo[cid as keyof typeof courseInfo];
+    const course = db.courses.find((course: any) => course._id === cid);
 
     if (!course) {
         return <div>Course not found</div>;
@@ -40,7 +23,9 @@ export default async function CourseStatus({
 
     return (
         <div id="wd-course-status" style={{ width: "350px" }}>
-            <h2>Course Status</h2>
+            <h2>{course.name}</h2>
+            <p><strong>Status:</strong> Published</p>
+            <p><strong>Credits:</strong> {course.credits}</p>
             
             <div className="d-flex">
                 <div className="w-50 pe-1">
