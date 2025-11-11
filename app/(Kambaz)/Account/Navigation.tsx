@@ -2,43 +2,28 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Nav, NavItem, NavLink } from "react-bootstrap";
+import { useSelector } from "react-redux";
+import { RootState } from "../store";
 
 export default function AccountNavigation() {
+    const { currentUser } = useSelector((state: RootState) => state.accountReducer);
+    const links = currentUser ? ["Profile"] : ["Signin", "Signup"];
     const pathname = usePathname();
     
-    const isActive = (path: string) => {
-        return pathname.includes(path);
-    };
-    
     return (
-        <div id="wd-account-navigation" className="list-group">
-            <Link 
-                href="/Account/Signin" 
-                id="wd-signin-link"
-                className={`list-group-item list-group-item-action border-0 ${
-                    isActive("Signin") ? "text-black border-start border-dark border-3" : "text-danger"
-                }`}
-            >
-                Signin
-            </Link>
-            <Link 
-                href="/Account/Signup" 
-                id="wd-signup-link"
-                className={`list-group-item list-group-item-action border-0 ${
-                    isActive("Signup") ? "text-black border-start border-dark border-3" : "text-danger"
-                }`}
-            >
-                Signup
-            </Link>
-            <Link 
-                href="/Account/Profile" 
-                id="wd-profile-link"
-                className={`list-group-item list-group-item-action border-0 ${
-                    isActive("Profile") ? "text-black border-start border-dark border-3" : "text-danger"
-                }`}
-            >
-                Profile
-            </Link>
-        </div>
+        <Nav variant="pills">
+            {links.map((link) => (
+                <NavItem key={link}>
+                    <NavLink 
+                        as={Link} 
+                        href={`/Account/${link}`} 
+                        active={pathname.endsWith(link.toLowerCase())}
+                    >
+                        {link}
+                    </NavLink>
+                </NavItem>
+            ))}
+        </Nav>
     );
 }

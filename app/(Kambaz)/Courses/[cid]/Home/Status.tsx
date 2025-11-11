@@ -61,6 +61,7 @@ export default async function CourseStatus({
             </Button>
             <Button variant="secondary" size="lg" className="w-100 mt-1 text-start">
                 <IoMdNotifications className="me-2 fs-5" /> View Course Notifications
+                5
             </Button>
         </div>
     );

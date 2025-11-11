@@ -1,3 +1,4 @@
+"use client";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 // import "./globals.css";
@@ -5,18 +6,20 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import {ReactNode} from "react";
 import KambazNavigation from "./Navigation";
 import "./styles.css";
+import store from "./store";
+import { Provider } from "react-redux";
 
 export default function KambazLayout({
                                          children,
                                      }: Readonly<{ children: ReactNode }>) {
     return (
-        <div className="d-flex">
-            <div>
-                <KambazNavigation/>
+        <Provider store={store}>
+            <div className="d-flex" id="wd-kambaz">
+                <div>
+                    <KambazNavigation />
+                </div>
+                <div className="flex-fill ps-3 wd-main-content-offset">{children}</div>
             </div>
-            <div className="wd-main-content-offset p-3 flex-fill">
-                {children}
-            </div>
-        </div>
+        </Provider>
     );
 }

@@ -1,17 +1,29 @@
 "use client";
 
-import { useParams } from 'next/navigation';
+import { useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Button, Form } from 'react-bootstrap';
-import { FaPlus, FaSearch } from 'react-icons/fa';
+import { Button, Form, Modal } from 'react-bootstrap';
+import { FaPlus, FaSearch, FaTrash, FaEdit } from 'react-icons/fa';
 import { BsGripVertical } from 'react-icons/bs';
 import { IoEllipsisVertical } from 'react-icons/io5';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '../../../store';
+import { deleteAssignment } from './reducer';
+import AssignmentEditor from './AssignmentEditor';
 import * as db from "../../../Database";
 
 export default function Assignments() {
     const { cid } = useParams();
-    const assignments = db.assignments;
+    const router = useRouter();
+    const dispatch = useDispatch();
+    const { assignments } = useSelector((state: RootState) => state.assignmentsReducer);
     const course = db.courses.find((course: any) => course._id === cid);
+    
+    const [showEditor, setShowEditor] = useState(false);
+    const [editingAssignment, setEditingAssignment] = useState<string | null>(null);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [assignmentToDelete, setAssignmentToDelete] = useState<string | null>(null);
     
     // Group assignments by type
     const assignmentsByType = assignments
@@ -22,6 +34,29 @@ export default function Assignments() {
             acc[type].push(assignment);
             return acc;
         }, {});
+
+    const handleAddAssignment = () => {
+        setEditingAssignment(null);
+        setShowEditor(true);
+    };
+
+    const handleEditAssignment = (assignmentId: string) => {
+        setEditingAssignment(assignmentId);
+        setShowEditor(true);
+    };
+
+    const handleDeleteClick = (assignmentId: string) => {
+        setAssignmentToDelete(assignmentId);
+        setShowDeleteModal(true);
+    };
+
+    const confirmDelete = () => {
+        if (assignmentToDelete) {
+            dispatch(deleteAssignment(assignmentToDelete));
+        }
+        setShowDeleteModal(false);
+        setAssignmentToDelete(null);
+    };
 
     const renderSection = (sectionTitle: string, items: any[], percentage: string) => {
         if (!items || items.length === 0) return null;
@@ -44,20 +79,37 @@ export default function Assignments() {
                     {items.map((item: any, index: number) => (
                         <div key={index} className="wd-assignment-list-item border-start border-success border-3 p-3 border-bottom">
                             <div className="d-flex justify-content-between align-items-center">
-                                <div>
+                                <div className="flex-grow-1">
                                     <BsGripVertical className="me-2 text-muted" />
-                                    <Link
-                                        href={`/Courses/${cid}/Assignments/${item._id}`}
+                                    <span
+                                        onClick={() => handleEditAssignment(item._id)}
                                         className="wd-assignment-link text-decoration-none text-dark fw-bold"
+                                        style={{ cursor: 'pointer' }}
                                     >
                                         {item.title}
-                                    </Link>
+                                    </span>
                                     <br />
                                     <small className="text-muted ms-4">
                                         Due: {item.dueDate} | {item.points} pts
                                     </small>
                                 </div>
-                                <IoEllipsisVertical className="fs-5 text-muted" />
+                                <div className="d-flex align-items-center">
+                                    <Button
+                                        variant="outline-primary"
+                                        size="sm"
+                                        className="me-2"
+                                        onClick={() => handleEditAssignment(item._id)}
+                                    >
+                                        <FaEdit />
+                                    </Button>
+                                    <Button
+                                        variant="outline-danger"
+                                        size="sm"
+                                        onClick={() => handleDeleteClick(item._id)}
+                                    >
+                                        <FaTrash />
+                                    </Button>
+                                </div>
                             </div>
                         </div>
                     ))}
@@ -68,6 +120,15 @@ export default function Assignments() {
 
     if (!course) {
         return <div>Course not found</div>;
+    }
+
+    if (showEditor) {
+        return (
+            <AssignmentEditor 
+                assignmentId={editingAssignment || undefined}
+                onClose={() => setShowEditor(false)}
+            />
+        );
     }
 
     return (
@@ -86,7 +147,7 @@ export default function Assignments() {
                     <Button variant="secondary" className="me-2" id="wd-add-assignment-group">
                         <FaPlus className="me-1" /> Group
                     </Button>
-                    <Button variant="danger" id="wd-add-assignment">
+                    <Button variant="danger" id="wd-add-assignment" onClick={handleAddAssignment}>
                         <FaPlus className="me-1" /> Assignment
                     </Button>
                 </div>
@@ -96,6 +157,24 @@ export default function Assignments() {
             {renderSection("Quizzes", assignmentsByType.quiz || [], "10%")}
             {renderSection("Exams", assignmentsByType.exam || [], "30%")}
             {renderSection("Projects", assignmentsByType.project || [], "20%")}
+
+            {/* Delete Confirmation Modal */}
+            <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirm Delete</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Are you sure you want to remove this assignment?
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+                        Cancel
+                    </Button>
+                    <Button variant="danger" onClick={confirmDelete}>
+                        Yes, Delete
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </div>
     );
 }
