@@ -50,12 +50,8 @@ export default function Dashboard() {
     const isFaculty = currentUser?.role === "FACULTY" || currentUser?.role === "ADMIN";
     
     const fetchCourses = async () => {
-        if (!currentUser) {
-            dispatch(setCourses([]));
-            return;
-        }
         try {
-            if (showAllCourses || isFaculty) {
+            if (!currentUser || showAllCourses || isFaculty) {
                 const allCourses = await client.fetchAllCourses();
                 dispatch(setCourses(allCourses));
             } else {
@@ -89,9 +85,8 @@ export default function Dashboard() {
         fetchCourses();
     }, [currentUser, showAllCourses]);
 
-    const coursesToShow = showAllCourses 
-        ? courses 
-        : courses;
+    // coursesToShow 已经由 fetchCourses 决定了显示哪些课程
+    const coursesToShow = courses;
 
     return (
         <div id="wd-dashboard">
@@ -131,7 +126,7 @@ export default function Dashboard() {
             )}
             <hr/>
             <h2 id="wd-dashboard-published">
-                {(showAllCourses || isFaculty) ? "All Courses" : "My Courses"} ({coursesToShow.length})
+                {(!currentUser || showAllCourses || isFaculty) ? "All Courses" : "My Courses"} ({coursesToShow.length})
             </h2>
             <hr/>
             <div id="wd-dashboard-courses">
