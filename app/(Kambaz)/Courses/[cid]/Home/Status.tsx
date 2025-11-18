@@ -1,4 +1,5 @@
 
+"use client";
 import { Button } from "react-bootstrap";
 import { MdDoNotDisturbAlt } from "react-icons/md";
 import { FaCheckCircle, FaBell } from "react-icons/fa";
@@ -7,15 +8,14 @@ import { LiaFileImportSolid } from "react-icons/lia";
 import { AiOutlineHome } from "react-icons/ai";
 import { MdOutlineAnalytics } from "react-icons/md";
 import { IoMdNotifications } from "react-icons/io";
-import * as db from "../../../Database";
+import { useParams } from "next/navigation";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../store";
 
-export default async function CourseStatus({
-    params,
-}: {
-    params: Promise<{ cid: string }>;
-}) {
-    const { cid } = await params;
-    const course = db.courses.find((course: any) => course._id === cid);
+export default function CourseStatus() {
+    const { cid } = useParams();
+    const { courses } = useSelector((state: RootState) => state.coursesReducer);
+    const course = courses.find((course: any) => course._id === cid);
 
     if (!course) {
         return <div>Course not found</div>;

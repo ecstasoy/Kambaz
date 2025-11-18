@@ -5,7 +5,8 @@ import { useParams, useRouter } from "next/navigation";
 import { Form, Button, Row, Col } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../../store";
-import { addAssignment, updateAssignment } from "./reducer";
+import { addAssignment, updateAssignment, setAssignments } from "./reducer";
+import * as client from "./client";
 
 interface AssignmentEditorProps {
     assignmentId?: string;
@@ -34,26 +35,40 @@ export default function AssignmentEditor({ assignmentId, onClose }: AssignmentEd
         if (assignmentId) {
             const existingAssignment = assignments.find((a: any) => a._id === assignmentId);
             if (existingAssignment) {
+                const existing = existingAssignment as any;
                 setAssignment({
-                    ...assignment,
-                    ...existingAssignment,
-                    availableFrom: (existingAssignment as any).availableFrom || "",
-                    availableUntil: (existingAssignment as any).availableUntil || "",
+                    _id: existing._id,
+                    title: existing.title,
+                    description: existing.description,
+                    points: existing.points,
+                    dueDate: existing.dueDate,
+                    availableFrom: existing.availableFrom || "",
+                    availableUntil: existing.availableUntil || "",
+                    course: existing.course,
+                    type: existing.type || "assignment",
                 });
             }
         }
     }, [assignmentId, assignments]);
 
-    const handleSave = () => {
-        if (assignmentId) {
-            dispatch(updateAssignment(assignment));
-        } else {
-            dispatch(addAssignment(assignment));
-        }
-        if (onClose) {
-            onClose();
-        } else {
-            router.push(`/Courses/${cid}/Assignments`);
+    const handleSave = async () => {
+        try {
+            if (assignmentId) {
+                await client.updateAssignment(assignment);
+                const assignments = await client.findAssignmentsForCourse(cid as string);
+                dispatch(setAssignments(assignments));
+            } else {
+                await client.createAssignmentForCourse(cid as string, assignment);
+                const assignments = await client.findAssignmentsForCourse(cid as string);
+                dispatch(setAssignments(assignments));
+            }
+            if (onClose) {
+                onClose();
+            } else {
+                router.push(`/Courses/${cid}/Assignments`);
+            }
+        } catch (error) {
+            console.error("Error saving assignment:", error);
         }
     };
 

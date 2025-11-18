@@ -13,7 +13,7 @@ export default function Home({
                     <Modules />
                 </div>
                 <div className="d-none d-lg-block">
-                    <CourseStatus params={params}/>
+                    <CourseStatus />
                 </div>
             </div>
         </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button, Form, Modal } from 'react-bootstrap';
@@ -9,16 +9,24 @@ import { BsGripVertical } from 'react-icons/bs';
 import { IoEllipsisVertical } from 'react-icons/io5';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../../store';
-import { deleteAssignment } from './reducer';
+import { deleteAssignment, setAssignments } from './reducer';
 import AssignmentEditor from './AssignmentEditor';
-import * as db from "../../../Database";
+import * as client from './client';
 
 export default function Assignments() {
     const { cid } = useParams();
     const router = useRouter();
     const dispatch = useDispatch();
     const { assignments } = useSelector((state: RootState) => state.assignmentsReducer);
-    const course = db.courses.find((course: any) => course._id === cid);
+    
+    const fetchAssignments = async () => {
+        const assignments = await client.findAssignmentsForCourse(cid as string);
+        dispatch(setAssignments(assignments));
+    };
+    
+    useEffect(() => {
+        fetchAssignments();
+    }, []);
     
     const [showEditor, setShowEditor] = useState(false);
     const [editingAssignment, setEditingAssignment] = useState<string | null>(null);
@@ -44,15 +52,27 @@ export default function Assignments() {
         setEditingAssignment(assignmentId);
         setShowEditor(true);
     };
+    
+    const refreshAssignments = async () => {
+        const assignments = await client.findAssignmentsForCourse(cid as string);
+        dispatch(setAssignments(assignments));
+        setShowEditor(false);
+    };
 
     const handleDeleteClick = (assignmentId: string) => {
         setAssignmentToDelete(assignmentId);
         setShowDeleteModal(true);
     };
 
-    const confirmDelete = () => {
+    const confirmDelete = async () => {
         if (assignmentToDelete) {
-            dispatch(deleteAssignment(assignmentToDelete));
+            try {
+                await client.deleteAssignment(assignmentToDelete);
+                const assignments = await client.findAssignmentsForCourse(cid as string);
+                dispatch(setAssignments(assignments));
+            } catch (error) {
+                console.error("Error deleting assignment:", error);
+            }
         }
         setShowDeleteModal(false);
         setAssignmentToDelete(null);
@@ -118,15 +138,13 @@ export default function Assignments() {
         );
     };
 
-    if (!course) {
-        return <div>Course not found</div>;
-    }
+    // Remove course check since we're getting assignments from server
 
     if (showEditor) {
         return (
             <AssignmentEditor 
                 assignmentId={editingAssignment || undefined}
-                onClose={() => setShowEditor(false)}
+                onClose={refreshAssignments}
             />
         );
     }
