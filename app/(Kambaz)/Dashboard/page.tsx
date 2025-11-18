@@ -50,6 +50,10 @@ export default function Dashboard() {
     const isFaculty = currentUser?.role === "FACULTY" || currentUser?.role === "ADMIN";
     
     const fetchCourses = async () => {
+        if (!currentUser) {
+            dispatch(setCourses([]));
+            return;
+        }
         try {
             if (showAllCourses || isFaculty) {
                 const allCourses = await client.fetchAllCourses();

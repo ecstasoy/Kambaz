@@ -53,9 +53,20 @@ export default function Labs() {
                             rel="noopener noreferrer"
                             id="wd-github-repo"
                         >
-                            Project Repository
+                            Project Repository (React Frontend)
                         </a>
                     </li>
+                    <li>
+                        <a
+                            href="https://github.com/ecstasoy/kambaz-node-server-app"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            id="wd-github-repo"
+                        >
+                            Project Repository (Server)
+                        </a>
+                    </li>
+
                 </ul>
             </div>
             <hr/>
