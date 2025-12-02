@@ -3,18 +3,21 @@ import { useDispatch, useSelector } from "react-redux";
 import { addNewCourse, deleteCourse, updateCourse, setCourses} from "../Courses/reducer";
 import { enrollUser, unenrollUser } from "../Courses/enrollmentsReducer";
 import { RootState } from "../store";
-import {useState, useEffect} from "react";
+import {useState, useEffect, useRef} from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {Row, Col, Card, CardImg, CardBody, CardTitle, CardText, Button, FormControl} from "react-bootstrap";
 import * as client from "../Courses/client";
 
 export default function Dashboard() {
+    const router = useRouter();
     const { courses } = useSelector((state: RootState) => state.coursesReducer);
     const { currentUser } = useSelector((state: RootState) => state.accountReducer);
     const { enrollments } = useSelector((state: RootState) => state.enrollmentsReducer);
     const dispatch = useDispatch();
     const [showAllCourses, setShowAllCourses] = useState(false);
     const [enrolledCourseIds, setEnrolledCourseIds] = useState<string[]>([]);
+    const fetchingRef = useRef(false);
     const [course, setCourse] = useState<any>({
         _id: "0", name: "New Course", number: "New Number",
         startDate: "2023-09-10", endDate: "2023-12-15",
@@ -47,16 +50,22 @@ export default function Dashboard() {
     const isFaculty = currentUser?.role === "FACULTY" || currentUser?.role === "ADMIN";
     
     const fetchCourses = async () => {
-        if (!currentUser) {
-            dispatch(setCourses([]));
+        if (!currentUser || fetchingRef.current) {
+            if (!currentUser) dispatch(setCourses([]));
             return;
         }
+        fetchingRef.current = true;
         try {
-            if (showAllCourses || isFaculty) {
+            if (showAllCourses) {
                 const allCourses = await client.fetchAllCourses();
                 dispatch(setCourses(Array.isArray(allCourses) ? allCourses : []));
                 const myCourses = await client.findMyCourses();
                 setEnrolledCourseIds(Array.isArray(myCourses) ? myCourses.map((c: any) => c._id) : []);
+            } else if (isFaculty) {
+                const allCourses = await client.fetchAllCourses();
+                const coursesArray = Array.isArray(allCourses) ? allCourses : [];
+                dispatch(setCourses(coursesArray));
+                setEnrolledCourseIds(coursesArray.map((c: any) => c._id));
             } else {
                 const myCourses = await client.findMyCourses();
                 const coursesArray = Array.isArray(myCourses) ? myCourses : [];
@@ -66,30 +75,37 @@ export default function Dashboard() {
         } catch (error) {
             console.error(error);
             dispatch(setCourses([]));
+        } finally {
+            fetchingRef.current = false;
         }
     };
 
     const onAddNewCourse = async () => {
-        const newCourse = await client.createCourse(course);
-        dispatch(setCourses([ ...courses, newCourse ]));
+        try {
+            const newCourse = await client.createCourse(course);
+            dispatch(setCourses([...(courses || []), newCourse]));
+            setEnrolledCourseIds([...(enrolledCourseIds || []), newCourse._id]);
+        } catch (error) {
+            console.error("Error creating course:", error);
+        }
     };
 
     const onDeleteCourse = async (courseId: string) => {
-        const status = await client.deleteCourse(courseId);
-        dispatch(setCourses(courses.filter((course) => course._id !== courseId)));
+        await client.deleteCourse(courseId);
+        await fetchCourses();
     };
 
     const onUpdateCourse = async () => {
         await client.updateCourse(course);
-        dispatch(setCourses(courses.map((c) => {
-            if (c._id === course._id) { return course; }
-            else { return c; }
-        })));
+        // 重新获取课程列表以确保数据同步
+        await fetchCourses();
     };
 
     useEffect(() => {
-        fetchCourses();
-    }, [currentUser, showAllCourses]);
+        if (currentUser) {
+            fetchCourses();
+        }
+    }, [currentUser?._id, showAllCourses]);
 
     const coursesToShow = Array.isArray(courses) ? courses : [];
 
@@ -161,7 +177,7 @@ export default function Dashboard() {
                                         <Button 
                                             variant="primary"
                                             onClick={() => {
-                                                window.location.href = `/Courses/${course._id}/Home`;
+                                                router.push(`/Courses/${course._id}/Home`);
                                             }}
                                         >
                                             Go
