@@ -22,25 +22,25 @@ export default function Modules() {
     
     const fetchModules = async () => {
         const modules = await client.findModulesForCourse(cid as string);
-        dispatch(setModules(modules));
+        dispatch(setModules(modules || []));
     };
     
     const onCreateModuleForCourse = async () => {
         if (!cid) return;
         const newModule = { name: moduleName, course: cid };
         const module = await client.createModuleForCourse(cid as string, newModule);
-        dispatch(setModules([...modules, module]));
+        dispatch(setModules([...(modules || []), module]));
         setModuleName("");
     };
     
     const onRemoveModule = async (moduleId: string) => {
         await client.deleteModule(cid as string, moduleId);
-        dispatch(setModules(modules.filter((m: any) => m._id !== moduleId)));
+        dispatch(setModules((modules || []).filter((m: any) => m._id !== moduleId)));
     };
     
     const onUpdateModule = async (module: any) => {
         await client.updateModule(cid as string, module);
-        const newModules = modules.map((m: any) => m._id === module._id ? module : m );
+        const newModules = (modules || []).map((m: any) => m._id === module._id ? module : m );
         dispatch(setModules(newModules));
     };
     
@@ -54,7 +54,7 @@ export default function Modules() {
                              addModule={onCreateModuleForCourse}/>
             <br/><br/><br/><br/>
             <ListGroup className="rounded-0" id="wd-modules">
-                {modules
+                {modules && Array.isArray(modules) && modules
                     .map((module: any) => (
                         <ListGroupItem key={module._id} className="wd-module p-0 mb-5 fs-5 border-gray">
                             <div className="wd-title p-3 ps-2 bg-secondary">

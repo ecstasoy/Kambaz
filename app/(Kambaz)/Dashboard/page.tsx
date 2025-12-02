@@ -23,7 +23,6 @@ export default function Dashboard() {
 
     const isUserEnrolled = (courseId: string) => {
         if (!currentUser?._id) return false;
-        // 检查课程ID是否在已注册课程列表中
         return enrolledCourseIds.includes(courseId);
     };
 
@@ -56,7 +55,6 @@ export default function Dashboard() {
             if (showAllCourses || isFaculty) {
                 const allCourses = await client.fetchAllCourses();
                 dispatch(setCourses(allCourses));
-                // 同时获取用户已注册的课程ID列表
                 const myCourses = await client.findMyCourses();
                 setEnrolledCourseIds(myCourses.map((c: any) => c._id));
             } else {
