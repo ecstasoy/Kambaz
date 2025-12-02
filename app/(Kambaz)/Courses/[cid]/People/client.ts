@@ -1,1 +1,1 @@
-export { findUsersForCourse } from "../client";
+export { findUsersForCourse } from "../../client";
