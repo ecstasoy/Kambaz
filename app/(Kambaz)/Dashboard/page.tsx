@@ -7,7 +7,6 @@ import {useState, useEffect} from "react";
 import Link from "next/link";
 import {Row, Col, Card, CardImg, CardBody, CardTitle, CardText, Button, FormControl} from "react-bootstrap";
 import * as client from "../Courses/client";
-import * as enrollmentsClient from "../Courses/enrollmentsClient";
 
 export default function Dashboard() {
     const { courses } = useSelector((state: RootState) => state.coursesReducer);
@@ -23,10 +22,16 @@ export default function Dashboard() {
 
     const isUserEnrolled = (courseId: string) => {
         if (!currentUser?._id) return false;
-        return enrollments.some(
-            (enrollment: any) => 
-                enrollment.user === currentUser._id && enrollment.course === courseId
-        );
+        if (showAllCourses) {
+            // 在 All Courses 模式下，检查课程是否在用户的注册课程中
+            return enrollments.some(
+                (enrollment: any) => 
+                    enrollment.user === currentUser._id && enrollment.course === courseId
+            );
+        } else {
+            // 在 My Courses 模式下，所有显示的课程都是已注册的
+            return true;
+        }
     };
 
     const handleEnrollment = async (courseId: string) => {
@@ -34,10 +39,10 @@ export default function Dashboard() {
         
         try {
             if (isUserEnrolled(courseId)) {
-                await enrollmentsClient.unenrollFromCourse(courseId);
+                await client.unenrollFromCourse(currentUser._id, courseId);
                 dispatch(unenrollUser({ userId: currentUser._id, courseId }));
             } else {
-                await enrollmentsClient.enrollInCourse(courseId);
+                await client.enrollIntoCourse(currentUser._id, courseId);
                 dispatch(enrollUser({ userId: currentUser._id, courseId }));
             }
             // 重新获取用户的课程以确保状态同步
@@ -94,7 +99,7 @@ export default function Dashboard() {
     return (
         <div id="wd-dashboard">
             <div className="d-flex justify-content-between align-items-center mb-4">
-                <h1 id="wd-dashboard-title">Dashboard</h1>
+            <h1 id="wd-dashboard-title">Dashboard</h1>
                 <Button 
                     variant="primary" 
                     onClick={() => setShowAllCourses(!showAllCourses)}
@@ -106,15 +111,15 @@ export default function Dashboard() {
 
             {isFaculty && (
                 <>
-                    <h5>New Course
+            <h5>New Course
                         <button onClick={onAddNewCourse} className="btn btn-primary float-end" id="wd-add-new-course-click" >
                                 Add
                         </button>
                         <button onClick={onUpdateCourse} className="btn btn-warning float-end me-2" id="wd-update-course-click" >
                                 Update
                         </button>
-                    </h5>
-                    <br/>
+            </h5>
+            <br/>
                     <FormControl
                         value={course.name}
                         className="mb-2"
@@ -124,7 +129,7 @@ export default function Dashboard() {
                         value={course.description}
                         rows={3}
                         onChange={(e) => setCourse({...course, description: e.target.value})}/>
-                    <hr/>
+            <hr/>
                 </>
             )}
             <hr/>
@@ -138,23 +143,23 @@ export default function Dashboard() {
                         .map((course) => (
                         <Col key={course._id} className="wd-dashboard-course" style={{width: "300px"}}>
                             <Card className="h-100">
-                                <CardImg
-                                    src="/images/reactjs.jpg"
-                                    variant="top"
-                                    width="100%"
-                                    height={160}
-                                    style={{objectFit: 'cover'}}
-                                />
-                                <CardBody className="card-body">
-                                    <CardTitle className="wd-dashboard-course-title text-nowrap overflow-hidden">
-                                        {course.name}
-                                    </CardTitle>
-                                    <CardText
-                                        className="wd-dashboard-course-description overflow-hidden"
-                                        style={{height: "100px"}}
-                                    >
-                                        {course.description}
-                                    </CardText>
+                                    <CardImg
+                                        src="/images/reactjs.jpg"
+                                        variant="top"
+                                        width="100%"
+                                        height={160}
+                                        style={{objectFit: 'cover'}}
+                                    />
+                                    <CardBody className="card-body">
+                                        <CardTitle className="wd-dashboard-course-title text-nowrap overflow-hidden">
+                                            {course.name}
+                                        </CardTitle>
+                                        <CardText
+                                            className="wd-dashboard-course-description overflow-hidden"
+                                            style={{height: "100px"}}
+                                        >
+                                            {course.description}
+                                        </CardText>
                                     <div className="d-flex justify-content-between align-items-center">
                                         <Button 
                                             variant="primary"
@@ -201,7 +206,7 @@ export default function Dashboard() {
                                             )}
                                         </div>
                                     </div>
-                                </CardBody>
+                                    </CardBody>
                             </Card>
                         </Col>
                     ))}

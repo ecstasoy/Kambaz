@@ -19,7 +19,7 @@ export default function AccountNavigation() {
                         as={Link} 
                         href={`/Account/${link}`} 
                         active={pathname.endsWith(link.toLowerCase())}
-                    >
+            >
                         {link}
                     </NavLink>
                 </NavItem>
@@ -30,7 +30,7 @@ export default function AccountNavigation() {
                         as={Link} 
                         href={`/Account/Users`} 
                         active={pathname.endsWith('users')}
-                    >
+            >
                         Users
                     </NavLink>
                 </NavItem>

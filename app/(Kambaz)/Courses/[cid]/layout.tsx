@@ -35,9 +35,9 @@ export default function CoursesLayout({
             <hr />
             <div className="d-flex">
                 {isNavigationVisible && (
-                    <div>
+                <div>
                         <CourseNavigation params={params} />
-                    </div>
+                </div>
                 )}
                 <div className="flex-fill">{children}</div>
             </div>
