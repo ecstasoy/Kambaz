@@ -14,6 +14,7 @@ export default function Dashboard() {
     const { enrollments } = useSelector((state: RootState) => state.enrollmentsReducer);
     const dispatch = useDispatch();
     const [showAllCourses, setShowAllCourses] = useState(false);
+    const [enrolledCourseIds, setEnrolledCourseIds] = useState<string[]>([]);
     const [course, setCourse] = useState<any>({
         _id: "0", name: "New Course", number: "New Number",
         startDate: "2023-09-10", endDate: "2023-12-15",
@@ -22,16 +23,8 @@ export default function Dashboard() {
 
     const isUserEnrolled = (courseId: string) => {
         if (!currentUser?._id) return false;
-        if (showAllCourses) {
-            // 在 All Courses 模式下，检查课程是否在用户的注册课程中
-            return enrollments.some(
-                (enrollment: any) => 
-                    enrollment.user === currentUser._id && enrollment.course === courseId
-            );
-        } else {
-            // 在 My Courses 模式下，所有显示的课程都是已注册的
-            return true;
-        }
+        // 检查课程ID是否在已注册课程列表中
+        return enrolledCourseIds.includes(courseId);
     };
 
     const handleEnrollment = async (courseId: string) => {
@@ -63,9 +56,13 @@ export default function Dashboard() {
             if (showAllCourses || isFaculty) {
                 const allCourses = await client.fetchAllCourses();
                 dispatch(setCourses(allCourses));
+                // 同时获取用户已注册的课程ID列表
+                const myCourses = await client.findMyCourses();
+                setEnrolledCourseIds(myCourses.map((c: any) => c._id));
             } else {
                 const myCourses = await client.findMyCourses();
                 dispatch(setCourses(myCourses));
+                setEnrolledCourseIds(myCourses.map((c: any) => c._id));
             }
         } catch (error) {
             console.error(error);
