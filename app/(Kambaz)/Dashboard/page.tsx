@@ -54,16 +54,18 @@ export default function Dashboard() {
         try {
             if (showAllCourses || isFaculty) {
                 const allCourses = await client.fetchAllCourses();
-                dispatch(setCourses(allCourses));
+                dispatch(setCourses(Array.isArray(allCourses) ? allCourses : []));
                 const myCourses = await client.findMyCourses();
-                setEnrolledCourseIds(myCourses.map((c: any) => c._id));
+                setEnrolledCourseIds(Array.isArray(myCourses) ? myCourses.map((c: any) => c._id) : []);
             } else {
                 const myCourses = await client.findMyCourses();
-                dispatch(setCourses(myCourses));
-                setEnrolledCourseIds(myCourses.map((c: any) => c._id));
+                const coursesArray = Array.isArray(myCourses) ? myCourses : [];
+                dispatch(setCourses(coursesArray));
+                setEnrolledCourseIds(coursesArray.map((c: any) => c._id));
             }
         } catch (error) {
             console.error(error);
+            dispatch(setCourses([]));
         }
     };
 
@@ -89,7 +91,7 @@ export default function Dashboard() {
         fetchCourses();
     }, [currentUser, showAllCourses]);
 
-    const coursesToShow = courses;
+    const coursesToShow = Array.isArray(courses) ? courses : [];
 
     return (
         <div id="wd-dashboard">
