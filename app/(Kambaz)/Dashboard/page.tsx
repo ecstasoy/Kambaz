@@ -60,17 +60,17 @@ export default function Dashboard() {
                 const allCourses = await client.fetchAllCourses();
                 dispatch(setCourses(Array.isArray(allCourses) ? allCourses : []));
                 const myCourses = await client.findMyCourses();
-                setEnrolledCourseIds(Array.isArray(myCourses) ? myCourses.map((c: any) => c._id) : []);
+                setEnrolledCourseIds(Array.isArray(myCourses) ? myCourses.map((c: any) => c?._id).filter(Boolean) : []);
             } else if (isFaculty) {
                 const allCourses = await client.fetchAllCourses();
                 const coursesArray = Array.isArray(allCourses) ? allCourses : [];
                 dispatch(setCourses(coursesArray));
-                setEnrolledCourseIds(coursesArray.map((c: any) => c._id));
+                setEnrolledCourseIds(coursesArray.map((c: any) => c?._id).filter(Boolean));
             } else {
                 const myCourses = await client.findMyCourses();
                 const coursesArray = Array.isArray(myCourses) ? myCourses : [];
                 dispatch(setCourses(coursesArray));
-                setEnrolledCourseIds(coursesArray.map((c: any) => c._id));
+                setEnrolledCourseIds(coursesArray.map((c: any) => c?._id).filter(Boolean));
             }
         } catch (error) {
             console.error(error);
@@ -97,7 +97,6 @@ export default function Dashboard() {
 
     const onUpdateCourse = async () => {
         await client.updateCourse(course);
-        // 重新获取课程列表以确保数据同步
         await fetchCourses();
     };
 
@@ -153,6 +152,7 @@ export default function Dashboard() {
             <div id="wd-dashboard-courses">
                 <Row xs={1} md={5} className="g-4">
                     {coursesToShow
+                        .filter((course) => course !== null && course !== undefined)
                         .map((course) => (
                         <Col key={course._id} className="wd-dashboard-course" style={{width: "300px"}}>
                             <Card className="h-100">
