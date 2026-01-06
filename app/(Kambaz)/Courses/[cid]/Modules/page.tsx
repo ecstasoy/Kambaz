@@ -1,129 +1,103 @@
-import {use} from 'react';
+"use client";
 
-const courseContent = {
-    "5610": {
-        title: "CS5610 Web Development",
-        modules: [
-            {
-                title: "Week 1 - HTML & CSS Basics",
-                lessons: [
-                    {
-                        title: "LEARNING OBJECTIVES",
-                        content: [
-                            "Introduction to Web Development",
-                            "HTML fundamentals",
-                        ]
-                    }
-                ]
-            },
-            {
-                title: "Week 2 - JavaScript Fundamentals",
-                lessons: [
-                    {
-                        title: "LEARNING OBJECTIVES",
-                        content: [
-                            "JavaScript syntax and variables",
-                            "JS Functions",
-                        ]
-                    }
-                ]
-            }
-        ]
-    },
-    "5700": {
-        title: "CS5700 Computer Networks",
-        modules: [
-            {
-                title: "Week 1 - Network Fundamentals",
-                lessons: [
-                    {
-                        title: "LEARNING OBJECTIVES",
-                        content: [
-                            "Introduction to Computer Networks",
-                            "OSI Model"
-                        ]
-                    }
-                ]
-            },
-            {
-                title: "Week 2 - Physical & Data Link Layer",
-                lessons: [
-                    {
-                        title: "LEARNING OBJECTIVES",
-                        content: [
-                            "Physical transmission media",
-                            "Error detection"
-                        ]
-                    }
-                ]
-            }
-        ]
-    },
-    "5800": {
-        title: "CS5800 Algorithms",
-        modules: [
-            {
-                title: "Week 1 - Algorithm Analysis",
-                lessons: [
-                    {
-                        title: "LEARNING OBJECTIVES",
-                        content: [
-                            "Introduction to Algorithms",
-                            "Big O notation"
-                        ]
-                    }
-                ]
-            },
-            {
-                title: "Week 2 - Sorting Algorithms",
-                lessons: [
-                    {
-                        title: "LEARNING OBJECTIVES",
-                        content: [
-                            "Bubble sort, Selection sort",
-                            "Merge sort, Quick sort",
-                        ]
-                    }
-                ]
-            }
-        ]
-    }
-};
+import {useState, useEffect} from "react";
+import {useParams} from "next/navigation";
+import {FormControl, ListGroup, ListGroupItem} from "react-bootstrap";
+import {BsGripVertical} from "react-icons/bs";
+import ModulesControls from "./ModulesControls";
+import LessonControlButtons from "./LessonControlButtons";
+import ModuleControlButtons from "./ModuleControlButtons";
+import {v4 as uuidv4} from "uuid";
+import {setModules, addModule, editModule, updateModule, deleteModule}
+    from "./reducer";
+import {useSelector, useDispatch} from "react-redux";
+import {RootState} from "../../../store";
+import * as client from "../../client";
 
-export default function Modules({
-                                    params,
-                                }: {
-    params: Promise<{ cid: string }>;
-}) {
-    const {cid} = use(params);
-    const course = courseContent[cid as keyof typeof courseContent];
-
-    if (!course) {
-        return <div>Course not found</div>;
-    }
-
+export default function Modules() {
+    const {cid} = useParams();
+    const [moduleName, setModuleName] = useState("");
+    const {modules} = useSelector((state: RootState) => state.modulesReducer);
+    const dispatch = useDispatch();
+    
+    const fetchModules = async () => {
+        const modules = await client.findModulesForCourse(cid as string);
+        dispatch(setModules(Array.isArray(modules) ? modules : []));
+    };
+    
+    const onCreateModuleForCourse = async () => {
+        if (!cid) return;
+        const newModule = { name: moduleName, course: cid };
+        await client.createModuleForCourse(cid as string, newModule);
+        await fetchModules();
+        setModuleName("");
+    };
+    
+    const onRemoveModule = async (moduleId: string) => {
+        await client.deleteModule(cid as string, moduleId);
+        await fetchModules();
+    };
+    
+    const onUpdateModule = async (module: any) => {
+        await client.updateModule(cid as string, module);
+        await fetchModules();
+    };
+    
+    useEffect(() => {
+        fetchModules();
+    }, []);
+    
     return (
         <div>
-            <h2>{course.title} - Modules</h2>
-            <ul id="wd-modules">
-                {course.modules.map((module, moduleIndex) => (
-                    <li key={moduleIndex} className="wd-module">
-                        <div className="wd-title">{module.title}</div>
-                        <ul className="wd-lessons">
-                            {module.lessons.map((lesson, lessonIndex) => (
-                                <li key={lessonIndex} className="wd-lesson">
-                                    <span className="wd-title">{lesson.title}</span>
-                                    <ul className="wd-content">
-                                        {lesson.content.map((item, itemIndex) => (
-                                            <li key={itemIndex} className="wd-content-item">{item}</li>
-                                        ))}
-                                    </ul>
-                                </li>
-                            ))}
-                        </ul>
-                    </li>
-                ))}
-            </ul>
+            <ModulesControls moduleName={moduleName} setModuleName={setModuleName}
+                             addModule={onCreateModuleForCourse}/>
+            <br/><br/><br/><br/>
+            <ListGroup className="rounded-0" id="wd-modules">
+                {modules && Array.isArray(modules) && modules
+                    .map((module: any) => (
+                        <ListGroupItem key={module._id} className="wd-module p-0 mb-5 fs-5 border-gray">
+                            <div className="wd-title p-3 ps-2 bg-secondary">
+                                <BsGripVertical className="me-2 fs-3"/>
+                                {!module.editing && module.name}
+                                {module.editing && (
+                                    <FormControl className="w-50 d-inline-block"
+                                                 onChange={(e) => dispatch(updateModule({
+                                                     ...module,
+                                                     name: e.target.value
+                                                 }))}
+                                                 onKeyDown={(e) => {
+                                                     if (e.key === "Enter") {
+                                                         onUpdateModule({...module, editing: false});
+                                                     }
+                                                 }}
+                                                 defaultValue={module.name}/>
+                                )}
+                                <ModuleControlButtons moduleId={module._id}
+                                                      deleteModule={(moduleId) => onRemoveModule(moduleId)}
+                                                      editModule={(moduleId) => dispatch(editModule(moduleId))}/>
+                            </div>
+                            {module.lessons && module.lessons.length > 0 ? (
+                                <ListGroup className="wd-lessons rounded-0">
+                                    {module.lessons.map((lesson: any) => (
+                                        <ListGroupItem key={lesson._id} className="wd-lesson p-3 ps-1">
+                                            <BsGripVertical className="me-2 fs-3"/>
+                                            {lesson.name}
+                                            <LessonControlButtons/>
+                                        </ListGroupItem>
+                                    ))}
+                                </ListGroup>
+                            ) : (
+                                <ListGroup className="wd-lessons rounded-0">
+                                    <ListGroupItem className="wd-lesson p-3 ps-1">
+                                        <BsGripVertical className="me-2 fs-3"/>
+                                        {module.description}
+                                        <LessonControlButtons/>
+                                    </ListGroupItem>
+                                </ListGroup>
+                            )}
+                        </ListGroupItem>
+                    ))}
+            </ListGroup>
         </div>
     );
 }
