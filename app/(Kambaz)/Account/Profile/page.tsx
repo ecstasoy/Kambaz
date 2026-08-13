@@ -51,8 +51,11 @@ export default function Profile() {
                     <FormControl id="wd-email" className="mb-2"
                                  defaultValue={profile.email}
                                  onChange={(e) => setProfile({ ...profile, email: e.target.value })} />
+                    {/* The server rejects a role change from anyone but an admin,
+                        so don't offer the control to everyone else. */}
                     <select className="form-control mb-2" id="wd-role"
                             value={profile.role || "USER"}
+                            disabled={currentUser?.role !== "ADMIN"}
                             onChange={(e) => setProfile({ ...profile, role: e.target.value })} >
                         <option value="USER">User</option>
                         <option value="ADMIN">Admin</option>
