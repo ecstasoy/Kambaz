@@ -36,8 +36,12 @@ export default function Profile() {
                     <FormControl id="wd-username" className="mb-2"
                                  defaultValue={profile.username}
                                  onChange={(e) => setProfile({ ...profile, username: e.target.value }) } />
-                    <FormControl id="wd-password" className="mb-2"
-                                 defaultValue={profile.password}
+                    {/* The server no longer sends the password back -- it is stored
+                        as a bcrypt hash and never leaves. So there is nothing to
+                        prefill, and a blank box means "keep the current one". */}
+                    <FormControl id="wd-password" className="mb-2" type="password"
+                                 placeholder="New password (leave blank to keep current)"
+                                 value={profile.password || ""}
                                  onChange={(e) => setProfile({ ...profile, password: e.target.value }) } />
                     <FormControl id="wd-firstname" className="mb-2"
                                  defaultValue={profile.firstName}
