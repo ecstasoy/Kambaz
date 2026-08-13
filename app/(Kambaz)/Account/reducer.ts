@@ -3,7 +3,9 @@ import { createSlice } from "@reduxjs/toolkit";
 interface User {
     _id: string;
     username: string;
-    password: string;
+    // Optional now: the server stores a bcrypt hash and never sends it back.
+    // Only set locally, on the profile form, when the user types a new one.
+    password?: string;
     firstName: string;
     lastName: string;
     email: string;
